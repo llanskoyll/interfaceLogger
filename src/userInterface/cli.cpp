@@ -16,7 +16,7 @@ int CLI::execute() {
 
 int CLI::menuShow() {
     std::string input;
-    int code = -1;
+    int code;
 
     while (true) {
         try {
@@ -30,22 +30,22 @@ int CLI::menuShow() {
 
         } catch (std::exception &exc) {
             std::cout << exc.what() << std::endl;
-            break;
+            return 1;
         }
     }
 
-    return code;
+    return 0;
 }
 
 void CLI::printComponents() {
     std::cout << "\x1B[2J\x1B[H" << std::endl;
     for (auto& [component, line] : menuComponents) {
-        std::cout << "\033[1;31m" << "Введите: " << component << "\033[0m";
+    std::cout << "\033[1;31m" << "Введите: " << component << "\033[0m";
         std::cout << " - для испольнения ";
         std::cout << "\033[1;32m" << line << "\033[0m";
     }
     std::cout << std::endl;
-}
+}       
 
 int CLI::executeComponents(std::string &command) {
 

@@ -20,7 +20,13 @@ private:
 
 private:
     typedef enum {
-        EXIT = 0
+        EXIT = 0,
+        ENABLE_PORT,
+        DESABLE_PORT,
+        RUN_SCANNING,
+        STOP_SCANNING,
+        ENABLE_LOG,
+        DISABLE_LOG
     } components;
 
     std::unordered_map<components, std::function<int()>> funComponents;
