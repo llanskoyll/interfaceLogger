@@ -8,6 +8,10 @@
 namespace network {
 
 bool NetworkModel::setPort(uint32_t port) {
+    if (ports.find(port) != ports.end()) {
+        return false;
+    }
+
     return ports.insert({port, Port(port)}).first != ports.end();
 }
 

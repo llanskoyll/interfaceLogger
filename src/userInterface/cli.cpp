@@ -97,7 +97,7 @@ void CLI::setPort() {
 
     uint32_t port = std::stoul(portStr);
     if (!provider->network()->setPort(port)) {
-        printMessage(WARNING, "Не удалось установить порт");
+        printMessage(ERROR, "Не удалось установить порт");
     } else {
         printMessage(SUCCESS, "Порт успешно установлен");
     }
