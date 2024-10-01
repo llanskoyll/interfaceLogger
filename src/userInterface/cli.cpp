@@ -85,8 +85,13 @@ void CLI::printMessage(messageType type, std::string message) {
 
 void CLI::setPort() {
     std::string portStr;
+    std::string ports = provider->network()->listOpenPortsInSystem();
 
     clearConsole();
+    printMessage(WARNING, "Список портов");
+    std::cout << std::endl;
+    printMessage(SUCCESS, ports);
+    std::cout << std::endl;
     printMessage(INVITE, "Введите порт:");
     std::cin >> portStr;
 

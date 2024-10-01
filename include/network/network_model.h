@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <string>
 
 #include <network/port.h>
 
@@ -13,6 +14,8 @@ public:
     ~NetworkModel() = default;
 
     bool setPort(uint32_t port);
+
+    std::string listOpenPortsInSystem();
 
 private:
     std::unordered_map<uint32_t, Port> ports;
