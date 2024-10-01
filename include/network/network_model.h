@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 #include <network/port.h>
@@ -18,6 +19,7 @@ public:
     std::string listOpenPortsInSystem();
 
 private:
+    std::unordered_set<uint32_t> alivePort;
     std::unordered_map<uint32_t, Port> ports;
 };
 

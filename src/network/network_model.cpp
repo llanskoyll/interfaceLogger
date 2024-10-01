@@ -9,7 +9,13 @@
 namespace network {
 
 bool NetworkModel::setPort(uint32_t port) {
+    // уже выбранные порты
     if (ports.find(port) != ports.end()) {
+        return false;
+    }
+
+    // Наличие открытых портов вообще в системе
+    if (alivePort.find(port) == alivePort.end()) {
         return false;
     }
 
@@ -48,6 +54,8 @@ std::string NetworkModel::listOpenPortsInSystem() {
         result += " ";
         result += ports[i];
         result += "\n";
+
+        alivePort.insert(std::stoul(ports[i]));
     }
 
     return result;
