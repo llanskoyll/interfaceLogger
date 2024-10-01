@@ -9,7 +9,7 @@ namespace provider {
 
 class ProviderModel {
 public:
-    ProviderModel() = default;
+    ProviderModel();
 
     void exitApp();
 

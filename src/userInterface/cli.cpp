@@ -4,7 +4,9 @@
 
 namespace interface {
 
-CLI::CLI() {
+CLI::CLI()
+    : provider(std::make_unique<provider::ProviderModel>())
+{
     funComponents.insert({EXIT, std::bind(&CLI::exit, this)});
     funComponents.insert({SET_PORT, std::bind(&CLI::setPort, this)});
 
@@ -87,7 +89,6 @@ void CLI::setPort() {
     clearConsole();
     printMessage(INVITE, "Введите порт:");
     std::cin >> portStr;
-    std::cout << std::endl;
 
     uint32_t port = std::stoul(portStr);
     if (!provider->network()->setPort(port)) {
@@ -97,4 +98,5 @@ void CLI::setPort() {
     }
     std::cout << std::endl;
 }
+
 } // namespace interface

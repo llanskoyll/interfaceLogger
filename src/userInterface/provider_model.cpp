@@ -2,6 +2,10 @@
 
 namespace provider {
 
+ProviderModel::ProviderModel() {
+    networkPtr = std::make_shared<network::NetworkModel>();
+}
+
 void ProviderModel::exitApp() {
     int code = 0;
     // something things
