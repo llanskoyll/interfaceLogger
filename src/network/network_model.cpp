@@ -50,8 +50,9 @@ std::string NetworkModel::listOpenPortsInSystem() {
     }
 
     for (size_t i = 0; i < protocols.size() && i < ports.size(); ++i) {
+        result += "Протокол: ";
         result += protocols[i];
-        result += " ";
+        result += "\tПорт: ";
         result += ports[i];
         result += "\n";
 
