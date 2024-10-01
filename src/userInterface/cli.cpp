@@ -6,8 +6,10 @@ namespace interface {
 
 CLI::CLI() {
     funComponents.insert({EXIT, std::bind(&CLI::exit, this)});
+    funComponents.insert({SET_PORT, std::bind(&CLI::setPort, this)});
 
     menuComponents.insert({EXIT, "Выход"});
+    menuComponents.insert({SET_PORT, "Установить порт"});
 }
 
 int CLI::execute() {
@@ -18,16 +20,14 @@ int CLI::menuShow() {
     std::string input;
     int code;
 
+    clearConsole();
     while (true) {
         try {
             printComponents();
             std::cin >> input;
-            code = executeComponents(input);
-
-            if (code == EXIT) {
-                break;
-            }
-
+            // Парсинг ввода
+            auto component = static_cast<components>(std::stoi(input));
+            executeComponents(component);
         } catch (std::exception &exc) {
             std::cout << exc.what() << std::endl;
             return 1;
@@ -37,28 +37,64 @@ int CLI::menuShow() {
     return 0;
 }
 
-void CLI::printComponents() {
+void CLI::clearConsole() {
     std::cout << "\x1B[2J\x1B[H" << std::endl;
+}
+void CLI::printComponents() {
     for (auto& [component, line] : menuComponents) {
-    std::cout << "\033[1;31m" << "Введите: " << component << "\033[0m";
-        std::cout << " - для испольнения ";
-        std::cout << "\033[1;32m" << line << "\033[0m";
+        std::cout << "Введите: " << component << " - для испольнения " << line << std::endl;
     }
-    std::cout << std::endl;
 }       
 
-int CLI::executeComponents(std::string &command) {
-
-    // TODO: парсинг command
-
-    components component = static_cast<components>(std::stoi(command));
-
-    return funComponents.find(component)->second();
+void CLI::executeComponents(components component) {
+    funComponents.find(component)->second();
 }
 
-int CLI::exit() {
-    // TODO: методы при закрытие приложения
-    return 0;
+void CLI::exit() {
+    provider->exitApp();
 }
 
+void CLI::printMessage(messageType type, std::string message) {
+    std::string start;
+    std::string end;
+    switch (type) {
+        case ERROR:
+            start = "\033[1;31m";
+            end = "\033[0m";
+            break;
+        case WARNING:
+            start = "\033[1;33m";
+            end = "\033[0m";
+            break;
+        case SUCCESS:
+            start = "\033[1;32m";
+            end = "\033[0m";
+            break;
+        case INVITE:
+            start = "\033[1;34m";
+            end = "\033[0m";
+            break;
+        default:
+            break;
+    }
+
+    std::cout << start << message << end;
+}
+
+void CLI::setPort() {
+    std::string portStr;
+
+    clearConsole();
+    printMessage(INVITE, "Введите порт:");
+    std::cin >> portStr;
+    std::cout << std::endl;
+
+    uint32_t port = std::stoul(portStr);
+    if (!provider->network()->setPort(port)) {
+        printMessage(WARNING, "Не удалось установить порт");
+    } else {
+        printMessage(SUCCESS, "Порт успешно установлен");
+    }
+    std::cout << std::endl;
+}
 } // namespace interface

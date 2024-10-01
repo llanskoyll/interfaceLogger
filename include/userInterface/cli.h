@@ -1,6 +1,9 @@
 #pragma once
 
+#include <userInterface/provider_model.h>
+
 #include <unordered_map>
+#include <map>
 #include <functional>
 #include <string>
 
@@ -12,25 +15,37 @@ public:
     int execute();
 
 private:
-    int menuShow();
-    void printComponents();
-    int executeComponents(std::string &command);
-
-    int exit();
-
-private:
     typedef enum {
-        EXIT = 0,
-        ENABLE_PORT,
-        DESABLE_PORT,
+        ERROR = 0,
+        WARNING,
+        SUCCESS,
+        INVITE,
+    } messageType;
+
+    typedef enum {
+        SET_PORT = 0,
+        REMOVE_PORT,
         RUN_SCANNING,
         STOP_SCANNING,
         ENABLE_LOG,
-        DISABLE_LOG
+        DISABLE_LOG,
+        EXIT,
     } components;
 
-    std::unordered_map<components, std::function<int()>> funComponents;
-    std::unordered_map<components, std::string> menuComponents;
+    int menuShow();
+    void printComponents();
+    void printMessage(messageType type, std::string message);
+    void executeComponents(components component);
+    void clearConsole();
+
+    void exit();
+    void setPort();
+
+private:
+    std::unordered_map<components, std::function<void()>> funComponents;
+    std::map<components, std::string> menuComponents;
+
+    std::unique_ptr<provider::ProviderModel> provider;
 };
 
 } // namespace interface
