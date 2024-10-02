@@ -5,10 +5,13 @@
 #include <cstdio>
 #include <memory>
 #include <algorithm>
+#include <tuple>
+
+#include <pcapplusplus/PcapLiveDeviceList.h>
 
 namespace network {
 
-bool NetworkModel::setPort(uint32_t port) {
+bool NetworkModel::setPort(portNum port) {
     // уже выбранные порты
     if (ports.find(port) != ports.end()) {
         return false;
@@ -22,44 +25,23 @@ bool NetworkModel::setPort(uint32_t port) {
     return ports.insert({port, Port(port)}).first != ports.end();
 }
 
-std::string NetworkModel::listOpenPortsInSystem() {
-    std::vector<std::string> ports;
-    std::vector<std::string> protocols;
-    std::string result;
+std::vector<std::deque<std::string>> NetworkModel::listOfInterfaces() {
+    std::vector<std::deque<std::string>> interfaces;
 
-    std::array<char, 64> buffer;
-    std::string port;
-    std::string command("ss -tuln | grep 'LISTEN' | awk '{print $1, $5}' | grep -oE '[A-Za-z]+|:[0-9]+'");
+    auto listInterfaces = pcpp::PcapLiveDeviceList::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
 
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.data(), "r"), pclose);
-    if (!pipe) {
-        std::cerr << "Не удалось получить список открытых портов" << std::endl;
-        exit(1);
-    }
+    std::for_each(listInterfaces.cbegin(), listInterfaces.cend(), [&interfaces](auto &interface) -> void {
+        std::deque<std::string> lines;
+        lines.emplace_back("Интерфейс:");
+        lines.push_back(interface->getName());
+        lines.emplace_back("Описание:");
+        lines.push_back(interface->getDesc());
+        lines.emplace_back("IPv4:");
+        lines.push_back(interface->getIPv4Address().toString());
+        interfaces.emplace_back(std::move(lines));
+    });
 
-    while (std::fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        std::string line(buffer.data());
-
-        line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-
-        if (line.find(":") != std::string::npos) {
-            ports.push_back(line.substr(1));
-        } else {
-            protocols.push_back(line);
-        }
-    }
-
-    for (size_t i = 0; i < protocols.size() && i < ports.size(); ++i) {
-        result += "Протокол: ";
-        result += protocols[i];
-        result += "\tПорт: ";
-        result += ports[i];
-        result += "\n";
-
-        alivePort.insert(std::stoul(ports[i]));
-    }
-
-    return result;
+    return interfaces;
 }
 
 } // namespace network

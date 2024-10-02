@@ -6,11 +6,13 @@ namespace network {
 
 class Port {
 public:
+    using portNum = uint32_t;
+
     Port() = delete;
-    Port(uint32_t port);
+    Port(portNum port);
 
 private:
-    uint32_t port;
+    portNum port;
 };
 
 } // namespace network

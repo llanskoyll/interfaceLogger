@@ -1,6 +1,7 @@
 #include "userInterface/cli.h"
 
 #include <iostream>
+#include <iomanip>
 
 namespace interface {
 
@@ -84,24 +85,46 @@ void CLI::printMessage(messageType type, std::string message) {
 }
 
 void CLI::setPort() {
-    std::string portStr;
-    std::string ports = provider->network()->listOpenPortsInSystem();
+    auto interfaces = provider->network()->listOfInterfaces();
 
     clearConsole();
-    printMessage(WARNING, "Список портов");
+    printMessage(WARNING, "Информация о интерфейсах");
+    int num = 1;
     std::cout << std::endl;
-    printMessage(SUCCESS, ports);
-    std::cout << std::endl;
-    printMessage(INVITE, "Введите порт:");
-    std::cin >> portStr;
+    std::for_each(interfaces.begin(), interfaces.end(), [this, &num](auto& deq) -> void {
+        std::cout << std::left;
+        std::string line;
 
-    uint32_t port = std::stoul(portStr);
-    if (!provider->network()->setPort(port)) {
-        printMessage(ERROR, "Не удалось установить порт");
-    } else {
-        printMessage(SUCCESS, "Порт успешно установлен");
-    }
-    std::cout << std::endl;
+        printMessage(SUCCESS, std::string("Номер:") + std::to_string(num));
+        std::cout << std::setw(10);
+
+        line = deq.front();
+        printMessage(SUCCESS, line);
+        deq.pop_front();
+        
+        line = deq.front();
+        printMessage(ERROR, line);
+        std::cout << std::setw(line.size() < 25 ? 25 - line.size() : 1);
+        deq.pop_front();
+
+        line = deq.front();
+        printMessage(SUCCESS, line);
+        deq.pop_front();
+
+        line = deq.front();
+        printMessage(ERROR, line);
+        std::cout << std::setw(line.size() < 60 ? 60 - line.size() : 1);
+        deq.pop_front();
+
+        line = deq.front();
+        printMessage(SUCCESS, line);
+        deq.pop_front();
+
+        line = deq.front();
+        printMessage(ERROR, line);
+
+        std::cout << std::endl;
+    });
 }
 
 } // namespace interface

@@ -2,8 +2,10 @@
 
 namespace network {
 
-Port::Port(uint32_t port)
+Port::Port(portNum port)
     : port(port)
-{}
+{
+    // libpcap для перехвата
+}
 
 }
