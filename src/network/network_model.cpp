@@ -29,7 +29,7 @@ std::string NetworkModel::listOpenPortsInSystem() {
 
     std::array<char, 64> buffer;
     std::string port;
-    std::string command("ss -tuln | awk '{print $1, $5}' | grep -oE '[A-Za-z]+|:[0-9]+'");
+    std::string command("ss -tuln | grep 'LISTEN' | awk '{print $1, $5}' | grep -oE '[A-Za-z]+|:[0-9]+'");
 
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.data(), "r"), pclose);
     if (!pipe) {
