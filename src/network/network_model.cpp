@@ -11,18 +11,13 @@
 
 namespace network {
 
-bool NetworkModel::setPort(portNum port) {
-    // уже выбранные порты
-    if (ports.find(port) != ports.end()) {
+bool NetworkModel::enableInterface(std::string& interface) {
+    // уже включенные интерфейсы
+    if (interfaces.find(interface) != interfaces.end()) {
         return false;
     }
 
-    // Наличие открытых портов вообще в системе
-    if (alivePort.find(port) == alivePort.end()) {
-        return false;
-    }
-
-    return ports.insert({port, Port(port)}).first != ports.end();
+    return interfaces.insert(interface).first != interfaces.end();
 }
 
 std::vector<std::deque<std::string>> NetworkModel::listOfInterfaces() {

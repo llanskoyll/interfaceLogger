@@ -9,10 +9,10 @@ CLI::CLI()
     : provider(std::make_unique<provider::ProviderModel>())
 {
     funComponents.insert({EXIT, std::bind(&CLI::exit, this)});
-    funComponents.insert({SET_PORT, std::bind(&CLI::setPort, this)});
+    funComponents.insert({ENABLE_INTERFACE, std::bind(&CLI::enableInterface, this)});
 
     menuComponents.insert({EXIT, "Выход"});
-    menuComponents.insert({SET_PORT, "Установить порт"});
+    menuComponents.insert({ENABLE_INTERFACE, "Установить интерфейс"});
 }
 
 int CLI::execute() {
@@ -84,19 +84,39 @@ void CLI::printMessage(messageType type, std::string message) {
     std::cout << start << message << end;
 }
 
-void CLI::setPort() {
+void CLI::enableInterface() {
     auto interfaces = provider->network()->listOfInterfaces();
+    std::string in;
+    auto interface = printInterfaces(interfaces);
 
+    printMessage(WARNING, "Введите номер интерфейса: ");
+    std::cin >> in;
+
+    auto line = interface[std::stoi(in) - 1];
+
+    if (provider->network()->enableInterface(line)) {
+        printMessage(SUCCESS, "Интерфейс установлен");
+    } else {
+        printMessage(ERROR, "Не удалось установить интерфейс");
+    }
+
+    std::cout << std::endl;
+    return;
+}
+
+std::vector<std::string> CLI::printInterfaces(std::vector<std::deque<std::string>> &interfaces) {
+    std::vector<std::string> interface;
     clearConsole();
     printMessage(WARNING, "Информация о интерфейсах");
     int num = 1;
     std::cout << std::endl;
-    std::for_each(interfaces.begin(), interfaces.end(), [this, &num](auto& deq) -> void {
+    std::for_each(interfaces.begin(), interfaces.end(), [this, &num, &interface](auto& deq) -> void {
         std::cout << std::left;
         std::string line;
 
-        printMessage(SUCCESS, std::string("Номер:") + std::to_string(num));
-        std::cout << std::setw(10);
+        line = std::string("Номер:") + std::to_string(num);
+        printMessage(SUCCESS, line);
+        std::cout << std::setw(line.size() < 22 ? 22 - line.size() : 1);
 
         line = deq.front();
         printMessage(SUCCESS, line);
@@ -105,6 +125,7 @@ void CLI::setPort() {
         line = deq.front();
         printMessage(ERROR, line);
         std::cout << std::setw(line.size() < 25 ? 25 - line.size() : 1);
+        interface.push_back(line);
         deq.pop_front();
 
         line = deq.front();
@@ -124,7 +145,10 @@ void CLI::setPort() {
         printMessage(ERROR, line);
 
         std::cout << std::endl;
+        ++num;
     });
+
+    return interface;
 }
 
 } // namespace interface

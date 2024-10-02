@@ -23,12 +23,7 @@ private:
     } messageType;
 
     typedef enum {
-        SET_PORT = 0,
-        REMOVE_PORT,
-        RUN_SCANNING,
-        STOP_SCANNING,
-        ENABLE_LOG,
-        DISABLE_LOG,
+        ENABLE_INTERFACE = 0,
         EXIT,
     } components;
 
@@ -37,9 +32,10 @@ private:
     void printMessage(messageType type, std::string message);
     void executeComponents(components component);
     void clearConsole();
+    std::vector<std::string> printInterfaces(std::vector<std::deque<std::string>> &interfaces);
 
     void exit();
-    void setPort();
+    void enableInterface();
 
 private:
     std::unordered_map<components, std::function<void()>> funComponents;
