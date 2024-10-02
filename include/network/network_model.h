@@ -25,6 +25,7 @@ public:
 
 private:
     std::unordered_set<std::string> interfaces;
+    std::unordered_map<std::string, std::atomic<bool>> endFlags;
 
     boost::asio::thread_pool threadPool;
 };

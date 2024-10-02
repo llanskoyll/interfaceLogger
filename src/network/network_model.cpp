@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <tuple>
 #include <thread>
+#include <atomic>
 
 #include <pcapplusplus/PcapLiveDeviceList.h>
 #include <boost/asio/post.hpp>
@@ -15,13 +16,16 @@
 namespace network {
 
 NetworkModel::NetworkModel()
-    // 1 - интрефейс, 2 - Логгирование 
+    // 1 - интрефейс, 1 - Логгирование
     : threadPool(std::thread::hardware_concurrency() - 1 - 1)
 {}
 
 void NetworkModel::stopSniff() {
-    // maybe not work
-    threadPool.stop();
+    for (auto& [interface, flag] : endFlags) {
+        flag.store(true);
+    }
+
+    threadPool.join();
 }
 
 bool NetworkModel::enableInterface(std::string& interface) {
@@ -34,9 +38,14 @@ bool NetworkModel::enableInterface(std::string& interface) {
         return false;
     };
 
-    boost::asio::post(threadPool, []() -> void {
-        while (true) {
-            std::cout << "Thread\n";
+    auto iter = endFlags.emplace(interface, false).first;
+    if (iter == endFlags.end()) {
+        return false;
+    }
+
+    auto& flag = (*iter).second;
+    boost::asio::post(threadPool, [&flag]() -> void {
+        while (!flag.load()) {
             // sniffing interface and maybe logging
         }
     });
