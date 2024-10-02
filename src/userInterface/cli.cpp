@@ -10,9 +10,11 @@ CLI::CLI()
 {
     funComponents.insert({EXIT, std::bind(&CLI::exit, this)});
     funComponents.insert({ENABLE_INTERFACE, std::bind(&CLI::enableInterface, this)});
+    funComponents.insert({DISABLE_INTERFACES, std::bind(&CLI::disableIntrefaces, this)});
 
     menuComponents.insert({EXIT, "Выход"});
     menuComponents.insert({ENABLE_INTERFACE, "Установить интерфейс"});
+    menuComponents.insert({DISABLE_INTERFACES, "Остановить прослушивания интерфейсов"});
 }
 
 int CLI::execute() {
@@ -102,6 +104,10 @@ void CLI::enableInterface() {
 
     std::cout << std::endl;
     return;
+}
+
+void CLI::disableIntrefaces() {
+    provider->network()->stopSniff();
 }
 
 std::vector<std::string> CLI::printInterfaces(std::vector<std::deque<std::string>> &interfaces) {

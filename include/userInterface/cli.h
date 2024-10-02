@@ -24,6 +24,7 @@ private:
 
     typedef enum {
         ENABLE_INTERFACE = 0,
+        DISABLE_INTERFACES,
         EXIT,
     } components;
 
@@ -36,6 +37,7 @@ private:
 
     void exit();
     void enableInterface();
+    void disableIntrefaces();
 
 private:
     std::unordered_map<components, std::function<void()>> funComponents;

@@ -6,10 +6,23 @@
 #include <memory>
 #include <algorithm>
 #include <tuple>
+#include <thread>
 
 #include <pcapplusplus/PcapLiveDeviceList.h>
+#include <boost/asio/post.hpp>
+#include <boost/thread/thread.hpp>
 
 namespace network {
+
+NetworkModel::NetworkModel()
+    // 1 - интрефейс, 2 - Логгирование 
+    : threadPool(std::thread::hardware_concurrency() - 1 - 1)
+{}
+
+void NetworkModel::stopSniff() {
+    // maybe not work
+    threadPool.stop();
+}
 
 bool NetworkModel::enableInterface(std::string& interface) {
     // уже включенные интерфейсы
@@ -17,7 +30,18 @@ bool NetworkModel::enableInterface(std::string& interface) {
         return false;
     }
 
-    return interfaces.insert(interface).first != interfaces.end();
+    if (interfaces.insert(interface).first == interfaces.end()) {
+        return false;
+    };
+
+    boost::asio::post(threadPool, []() -> void {
+        while (true) {
+            std::cout << "Thread\n";
+            // sniffing interface and maybe logging
+        }
+    });
+
+    return true;
 }
 
 std::vector<std::deque<std::string>> NetworkModel::listOfInterfaces() {

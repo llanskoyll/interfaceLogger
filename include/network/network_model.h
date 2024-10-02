@@ -8,20 +8,25 @@
 #include <deque>
 
 #include <network/port.h>
+#include <boost/asio/thread_pool.hpp>
 
 namespace network {
 
 class NetworkModel {
 public:
-    NetworkModel() = default;
+    NetworkModel();
     ~NetworkModel() = default;
 
     bool enableInterface(std::string& interface);
 
     std::vector<std::deque<std::string>> listOfInterfaces();
 
+    void stopSniff();
+
 private:
     std::unordered_set<std::string> interfaces;
+
+    boost::asio::thread_pool threadPool;
 };
 
 } // namespace network
