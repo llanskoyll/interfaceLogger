@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <atomic>
+
+#include <pcapplusplus/PcapLiveDeviceList.h>
 
 namespace network { namespace interface {
 
@@ -12,18 +13,19 @@ public:
     Interface() = delete;
     Interface(std::string &interface);
 
-    bool operator==(const Interface& other) const {
-        return name_ == other.getName();
-    };
+    bool operator==(const Interface& other) const;
     
     std::string getName() const;
     void stopSniff() const;
 
     void sniffing() const;
- 
+
 private:
-    std::string name_;
-    mutable std::atomic<bool> sniffing_;
+    std::string uint8_vector_to_hex_string(const std::vector<uint8_t>& v) const;
+
+private:
+    pcpp::PcapLiveDevice *device;
+    mutable pcpp::PcapLiveDevice::PcapStats stats;
 };
 
 
