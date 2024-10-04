@@ -7,7 +7,7 @@
 #include <vector>
 #include <deque>
 
-#include <network/port.h>
+#include <network/interface.h>
 #include <boost/asio/thread_pool.hpp>
 
 namespace network {
@@ -24,10 +24,10 @@ public:
     void stopSniff();
 
 private:
-    std::unordered_set<std::string> interfaces;
-    std::unordered_map<std::string, std::atomic<bool>> endFlags;
+    std::unordered_set<interface::Interface, interface::InterfaceHash, interface::InterfaceEq> interfaces_;
 
-    boost::asio::thread_pool threadPool;
+    std::size_t countThread_;
+    boost::asio::thread_pool threadPool_;
 };
 
 } // namespace network

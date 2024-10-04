@@ -6,15 +6,15 @@
 namespace interface {
 
 CLI::CLI()
-    : provider(std::make_unique<provider::ProviderModel>())
+    : provider_(std::make_unique<provider::ProviderModel>())
 {
-    funComponents.insert({EXIT, std::bind(&CLI::exit, this)});
-    funComponents.insert({ENABLE_INTERFACE, std::bind(&CLI::enableInterface, this)});
-    funComponents.insert({DISABLE_INTERFACES, std::bind(&CLI::disableIntrefaces, this)});
+    funComponents_.insert({ENABLE_INTERFACE, std::bind(&CLI::enableInterface, this)});
+    funComponents_.insert({EXIT, std::bind(&CLI::exit, this)});
+    funComponents_.insert({DISABLE_INTERFACES, std::bind(&CLI::disableIntrefaces, this)});
 
-    menuComponents.insert({EXIT, "Выход"});
-    menuComponents.insert({ENABLE_INTERFACE, "Установить интерфейс"});
-    menuComponents.insert({DISABLE_INTERFACES, "Остановить прослушивания интерфейсов"});
+    menuComponents_.insert({EXIT, "Выход"});
+    menuComponents_.insert({ENABLE_INTERFACE, "Установить интерфейс"});
+    menuComponents_.insert({DISABLE_INTERFACES, "Остановить прослушивания интерфейсов"});
 }
 
 int CLI::execute() {
@@ -46,17 +46,17 @@ void CLI::clearConsole() {
     std::cout << "\x1B[2J\x1B[H" << std::endl;
 }
 void CLI::printComponents() {
-    for (auto& [component, line] : menuComponents) {
+    for (auto& [component, line] : menuComponents_) {
         std::cout << "Введите: " << component << " - для испольнения " << line << std::endl;
     }
 }       
 
 void CLI::executeComponents(components component) {
-    funComponents.find(component)->second();
+    funComponents_.find(component)->second();
 }
 
 void CLI::exit() {
-    provider->exitApp();
+    provider_->exitApp();
 }
 
 void CLI::printMessage(messageType type, std::string message) {
@@ -87,7 +87,7 @@ void CLI::printMessage(messageType type, std::string message) {
 }
 
 void CLI::enableInterface() {
-    auto interfaces = provider->network()->listOfInterfaces();
+    auto interfaces = provider_->network()->listOfInterfaces();
     std::string in;
     auto interface = printInterfaces(interfaces);
 
@@ -96,7 +96,7 @@ void CLI::enableInterface() {
 
     auto line = interface[std::stoi(in) - 1];
 
-    if (provider->network()->enableInterface(line)) {
+    if (!line.empty() && provider_->network()->enableInterface(line)) {
         printMessage(SUCCESS, "Интерфейс установлен");
     } else {
         printMessage(ERROR, "Не удалось установить интерфейс");
@@ -107,7 +107,7 @@ void CLI::enableInterface() {
 }
 
 void CLI::disableIntrefaces() {
-    provider->network()->stopSniff();
+    provider_->network()->stopSniff();
 }
 
 std::vector<std::string> CLI::printInterfaces(std::vector<std::deque<std::string>> &interfaces) {

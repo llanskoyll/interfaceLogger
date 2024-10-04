@@ -17,38 +17,39 @@ namespace network {
 
 NetworkModel::NetworkModel()
     // 1 - интрефейс, 1 - Логгирование
-    : threadPool(std::thread::hardware_concurrency() - 1 - 1)
+    : countThread_(std::thread::hardware_concurrency() - 1 - 1)
+    , threadPool_(countThread_)
 {}
 
 void NetworkModel::stopSniff() {
-    for (auto& [interface, flag] : endFlags) {
-        flag.store(true);
-    }
+    // for (auto& [interface, flag] : endFlags) {
+    //     flag.store(true);
+    // }
 
-    threadPool.join();
+    threadPool_.join();
+    interfaces_.clear();
 }
 
 bool NetworkModel::enableInterface(std::string& interface) {
-    // уже включенные интерфейсы
-    if (interfaces.find(interface) != interfaces.end()) {
+    if (interfaces_.size() == countThread_) {
         return false;
     }
 
-    if (interfaces.insert(interface).first == interfaces.end()) {
+    // уже включенные интерфейсы
+    if (interfaces_.find(interface) != interfaces_.end()) {
+        return false;
+    }
+
+    if (interfaces_.emplace(interface).first == interfaces_.end()) {
         return false;
     };
 
-    auto iter = endFlags.emplace(interface, false).first;
-    if (iter == endFlags.end()) {
-        return false;
-    }
-
-    auto& flag = (*iter).second;
-    boost::asio::post(threadPool, [&flag]() -> void {
-        while (!flag.load()) {
-            // sniffing interface and maybe logging
-        }
-    });
+    // auto& flag = (*iter).second;
+    // boost::asio::post(threadPool, [&flag]() -> void {
+    //     while (!flag.load()) {
+    //         // sniffing interface and maybe logging
+    //     }
+    // });
 
     return true;
 }

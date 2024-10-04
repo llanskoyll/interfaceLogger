@@ -40,10 +40,10 @@ private:
     void disableIntrefaces();
 
 private:
-    std::unordered_map<components, std::function<void()>> funComponents;
-    std::map<components, std::string> menuComponents;
+    std::unordered_map<components, std::function<void()>> funComponents_;
+    std::map<components, std::string> menuComponents_;
 
-    std::unique_ptr<provider::ProviderModel> provider;
+    std::unique_ptr<provider::ProviderModel> provider_;
 };
 
 } // namespace interface
