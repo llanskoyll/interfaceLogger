@@ -22,34 +22,33 @@ NetworkModel::NetworkModel()
 {}
 
 void NetworkModel::stopSniff() {
-    // for (auto& [interface, flag] : endFlags) {
-    //     flag.store(true);
-    // }
+    for (auto& interface : interfaces_) {
+        interface.stopSniff();
+    }
 
     threadPool_.join();
     interfaces_.clear();
 }
 
-bool NetworkModel::enableInterface(std::string& interface) {
+bool NetworkModel::enableInterface(std::string& interfaceName) {
     if (interfaces_.size() == countThread_) {
         return false;
     }
 
     // уже включенные интерфейсы
-    if (interfaces_.find(interface) != interfaces_.end()) {
+    if (interfaces_.find(interfaceName) != interfaces_.end()) {
         return false;
     }
 
-    if (interfaces_.emplace(interface).first == interfaces_.end()) {
+    auto it = interfaces_.emplace(interfaceName);
+    if (it.first == interfaces_.end()) {
         return false;
     };
 
-    // auto& flag = (*iter).second;
-    // boost::asio::post(threadPool, [&flag]() -> void {
-    //     while (!flag.load()) {
-    //         // sniffing interface and maybe logging
-    //     }
-    // });
+    auto& interface = *it.first;
+    boost::asio::post(threadPool_, [&interface]() -> void {
+        interface.sniffing();
+    });
 
     return true;
 }

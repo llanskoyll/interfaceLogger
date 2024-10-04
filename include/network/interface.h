@@ -17,15 +17,13 @@ public:
     };
     
     std::string getName() const;
-    void stopSniff();
+    void stopSniff() const;
 
-    void sniffing() {
-        // ...sniff
-    };
+    void sniffing() const;
  
 private:
     std::string name_;
-    std::atomic<bool> sniffing_;
+    mutable std::atomic<bool> sniffing_;
 };
 
 
