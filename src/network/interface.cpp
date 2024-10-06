@@ -4,7 +4,12 @@
 #include <sstream>
 #include <iomanip>
 
+#ifdef __APPLE__
+#include <SystemUtils.h>
+#else
 #include <pcapplusplus/SystemUtils.h>
+#endif
+
 
 namespace network::interface {
 

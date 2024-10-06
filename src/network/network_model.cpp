@@ -9,7 +9,11 @@
 #include <thread>
 #include <atomic>
 
+#ifdef __APPLE__
+#include <PcapLiveDeviceList.h>
+#else
 #include <pcapplusplus/PcapLiveDeviceList.h>
+#endif
 #include <boost/asio/post.hpp>
 #include <boost/thread/thread.hpp>
 

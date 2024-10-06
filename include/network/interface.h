@@ -2,7 +2,11 @@
 
 #include <iostream>
 
+#ifdef __APPLE__
+#include <PcapLiveDeviceList.h>
+#else
 #include <pcapplusplus/PcapLiveDeviceList.h>
+#endif
 
 namespace network { namespace interface {
 

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./build/portLogger
+sudo ./build/interfaceLogger
