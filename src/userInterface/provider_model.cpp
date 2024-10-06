@@ -8,7 +8,9 @@ ProviderModel::ProviderModel() {
 
 void ProviderModel::exitApp() {
     int code = 0;
-    // something things
+
+    network()->stopSniff();
+
     exit(code);
 }
 
