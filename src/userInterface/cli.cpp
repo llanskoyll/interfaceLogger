@@ -96,7 +96,8 @@ void CLI::enableInterface() {
 
     auto line = interface[std::stoi(in) - 1];
 
-    if (!line.empty() && provider_->network()->enableInterface(line)) {
+    std::string path("log/log.txt"); // TODO: Условный путь для файлова логов
+    if (!line.empty() && provider_->network()->enableInterface(line, path)) {
         printMessage(SUCCESS, "Интерфейс установлен");
     } else {
         printMessage(ERROR, "Не удалось установить интерфейс");

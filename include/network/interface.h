@@ -8,6 +8,8 @@
 #include <pcapplusplus/PcapLiveDeviceList.h>
 #endif
 
+#include <log/log.h>
+
 namespace network { namespace interface {
 
 class Interface {
@@ -22,7 +24,7 @@ public:
     std::string getName() const;
     void stopSniff() const;
 
-    void sniffing() const;
+    void sniffing(std::shared_ptr<log::Log> &log) const;
 
 private:
     std::string uint8_vector_to_hex_string(const std::vector<uint8_t>& v) const;

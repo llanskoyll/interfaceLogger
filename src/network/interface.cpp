@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <log/log.h>
+
 #ifdef __APPLE__
 #include <SystemUtils.h>
 #else
@@ -33,38 +35,33 @@ void Interface::stopSniff() const {
     device->stopCapture();
 }
 
-void Interface::sniffing() const {
+void Interface::sniffing(std::shared_ptr<log::Log> &logInterface) const {
     if (!device->open()) {
         std::cerr << "Cannot open device" << std::endl;
     }
 
-    device->startCapture([this](pcpp::RawPacket *pPacket, pcpp::PcapLiveDevice *pDeivce, void *cookie) -> bool {
+    device->startCapture([this, &logInterface](pcpp::RawPacket *pPacket, pcpp::PcapLiveDevice *pDeivce, void *cookie) -> bool {
         pcpp::Packet packet(pPacket);
 
         pcpp::Layer* layer;
 
-        if (packet.isPacketOfType(pcpp::Ethernet)) {
-            layer = packet.getLayerOfType(pcpp::Ethernet);
+        if (packet.isPacketOfType(pcpp::IPv6)) {
+            layer = packet.getLayerOfType(pcpp::IPv6);
         } else if (packet.isPacketOfType(pcpp::IPv4)) {
             layer = packet.getLayerOfType(pcpp::IPv4);
-        } else if (packet.isPacketOfType(pcpp::IPv6)) {
-            layer = packet.getLayerOfType(pcpp::IPv6);
+        } else if (packet.isPacketOfType(pcpp::Ethernet)) {
+            layer = packet.getLayerOfType(pcpp::Ethernet);
         } else if (packet.isPacketOfType(pcpp::UnknownProtocol)) {
             return true;
         }
 
-        std::string infoAboutIp = layer->toString();
-        std::vector<uint8_t> log;
-
-        for (auto ch : infoAboutIp) {
-            log.push_back(ch);
-        }
-
+        std::string infoLog = layer->toString();
         std::vector<uint8_t> data(layer->getDataLen());
         layer->copyData(data.data());
 
+        infoLog += uint8_vector_to_hex_string(data);
         // TODO: обработка данных и логгирование
-        std::cout << log.data() << " Данные: " << uint8_vector_to_hex_string(data) << std::endl;
+        logInterface->pushLog(std::move(infoLog));
 
         return true;
     }, static_cast<void *>(&stats));

@@ -27,31 +27,35 @@ NetworkModel::NetworkModel()
 
 void NetworkModel::stopSniff() {
     for (auto& interface : interfaces_) {
-        interface.stopSniff();
+        interface.first.stopSniff();
     }
 
     threadPool_.join();
     interfaces_.clear();
 }
 
-bool NetworkModel::enableInterface(std::string& interfaceName) {
-    if (interfaces_.size() == countThread_) {
-        return false;
-    }
+bool NetworkModel::enableInterface(std::string& interfaceName, std::string &pathSave) {
+    // Более корректная проверка на количество тредов для логирования
+    // if (interfaces_.size() == countThread_) {
+    //     return false;
+    // }
 
     // уже включенные интерфейсы
     if (interfaces_.find(interfaceName) != interfaces_.end()) {
         return false;
     }
 
-    auto it = interfaces_.emplace(interfaceName);
+    std::shared_ptr<log::Log> logImpl = std::make_shared<log::LogFile>();
+    auto it = interfaces_.emplace(interfaceName, logImpl);
     if (it.first == interfaces_.end()) {
         return false;
     };
 
     auto& interface = *it.first;
-    boost::asio::post(threadPool_, [&interface]() -> void {
-        interface.sniffing();
+    interface.first.sniffing(interface.second);
+
+    boost::asio::post(threadPool_, [log = std::ref(interface.second), &pathSave]() -> void {
+        log.get()->logging(pathSave);
     });
 
     return true;

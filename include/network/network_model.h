@@ -8,6 +8,8 @@
 #include <deque>
 
 #include <network/interface.h>
+#include <log/log.h>
+
 #include <boost/asio/thread_pool.hpp>
 
 namespace network {
@@ -17,14 +19,15 @@ public:
     NetworkModel();
     ~NetworkModel() = default;
 
-    bool enableInterface(std::string& interface);
+    bool enableInterface(std::string& interface, std::string &pathSave);
 
     std::vector<std::deque<std::string>> listOfInterfaces();
 
     void stopSniff();
 
 private:
-    std::unordered_set<interface::Interface, interface::InterfaceHash, interface::InterfaceEq> interfaces_;
+    std::unordered_map<interface::Interface, std::shared_ptr<log::Log>,
+                       interface::InterfaceHash, interface::InterfaceEq> interfaces_;
 
     std::size_t countThread_;
     boost::asio::thread_pool threadPool_;
