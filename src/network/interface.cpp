@@ -59,7 +59,7 @@ void Interface::sniffing(std::shared_ptr<log::Log> &logInterface) const {
         std::vector<uint8_t> data(layer->getDataLen());
         layer->copyData(data.data());
 
-        infoLog += uint8_vector_to_hex_string(data);
+        infoLog += std::string(" Data: ") + uint8_vector_to_hex_string(data);
         // TODO: обработка данных и логгирование
         logInterface->pushLog(std::move(infoLog));
 
